@@ -19,7 +19,7 @@
     <div class="container">
         <h2>OS VOTE</h2>
         <p>Vote for your favorite OS to develop on</p>
-        <div id="hasVotedOnceMsg" class="card-panel hidden" style="width: 30%">
+        <div id="hasVotedOnceMsg" class="card-panel hidden" style="width: 100%">
             <span class="red-text text-darken-2">You have already voted, you can only vote once.</span>
         </div>
         <form id="vote-form">
@@ -39,12 +39,13 @@
                 <input type="radio" name="os" id="other" value="Other">
                 <label for="other">Something Else</label>
             </p>
-            <input type="submit" value="Vote" class="btn">
+            <input type="submit" value="Vote" class="btn" id="voting-btn">
         </form>
 
         <br>
         <br>
 
+        <h5 style="text-align: center" id="chartTitle"></h5>
         <div id="chartContainer" style="height: 300px; width: 100%"></div>
 
     </div>

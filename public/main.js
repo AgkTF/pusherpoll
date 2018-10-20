@@ -1,10 +1,11 @@
 const form = document.getElementById('vote-form');
+let event;
 
 // Form submit event
 form.addEventListener('submit', e => {
     const choice = document.querySelector('input[name="os"]:checked').value;
     const data   = { os: choice };
-
+    
     // Create our request
     fetch('http://localhost:3000/poll', {
         method: 'POST',
@@ -15,7 +16,7 @@ form.addEventListener('submit', e => {
     })
         .then(res => res.json())
         .catch(err => console.error(err));
-
+        
     e.preventDefault();
 });
 
@@ -24,9 +25,17 @@ fetch('http://localhost:3000/poll')
     .then(data => {
         let votes = data.votes;
         let totalVotes = votes.length;
+        document.querySelector('#chartTitle').textContent = `Total Votes: ${totalVotes}`;
         
+        let voteCounts = {
+            Windows: 0,
+            MacOS: 0,
+            Linux: 0,
+            Other: 0
+        };
+
         // Count vote points
-        const voteCounts = votes.reduce(
+        voteCounts = votes.reduce(
             (acc, vote) => ((acc[vote.os] = (acc[vote.os] || 0) + parseInt(vote.points)), acc), {}
         );
 
@@ -42,12 +51,14 @@ fetch('http://localhost:3000/poll')
         const chartContainer = document.querySelector('#chartContainer');
 
         if (chartContainer) {
+
+            document.addEventListener('votesAdded', e => {
+                document.querySelector('#chartTitle').textContent = `Total Votes: ${e.detail.totalVotes}`;
+            })
+
             const chart = new CanvasJS.Chart('chartContainer', {
                 animationEnabled: true,
                 theme: 'theme1',
-                title: {
-                    text: `Total Votes: ${totalVotes}`
-                },
                 data: [{
                     type: 'column',
                     dataPoints: dataPoints
@@ -68,6 +79,9 @@ fetch('http://localhost:3000/poll')
                 dataPoints = dataPoints.map(dataPoint => {
                     if (dataPoint.label == data.os) {
                         dataPoint.y += data.points;
+                        totalVotes += data.points;
+                        event = new CustomEvent('votesAdded', {detail: { totalVotes: totalVotes }});
+                        document.dispatchEvent(event);
                         return dataPoint;
                     } else {
                         return dataPoint;
